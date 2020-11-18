@@ -62,13 +62,13 @@ public class NavigationActivity extends Activity implements
         l.setLayoutParams(layoutParams);
 
         //判断实时还是模拟
-         if(intent.getStringExtra("NavType").equals("0") ){
-           mIsEmulatorNavi=false;
-        }
-        else
-        {
-           mIsEmulatorNavi=true;
-        }
+//         if(intent.getStringExtra("NavType").equals("0") ){
+//           mIsEmulatorNavi=false;
+//        }
+//        else
+//        {
+//           mIsEmulatorNavi=true;
+//        }
         mAmapAMapNaviView = new AMapNaviView(this);
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams
@@ -76,7 +76,7 @@ public class NavigationActivity extends Activity implements
         l.addView(mAmapAMapNaviView, lp);
 
         setContentView(l);
-        init(savedInstanceState);
+        init(savedInstanceState, intent);
     }
 
     /**
@@ -84,17 +84,26 @@ public class NavigationActivity extends Activity implements
      *
      * @param savedInstanceState
      */
-    private void init(Bundle savedInstanceState) {
+    private void init(Bundle savedInstanceState, Intent intent) {
         mStartPoints.add(mNaviStart);
         mEndPoints.add(mNaviEnd);
         mAmapAMapNaviView.onCreate(savedInstanceState);
         mAmapAMapNaviView.setAMapNaviViewListener(this);
-        AMapNavi.getInstance(this).calculateDriveRoute(mStartPoints,
-                mEndPoints, null, AMapNavi.DrivingDefault);
+        if(intent.getStringExtra("NavType").equals("0") ){
+            AMapNavi.getInstance(this).calculateDriveRoute(mStartPoints,
+                    mEndPoints, null, AMapNavi.DrivingDefault);
+        } else {
+            AMapNavi.getInstance(this).calculateWalkRoute(mStartPoints.get(0),
+                    mEndPoints.get(0));
+        }
         Log.i("result","注册");
 
-        SpeechUtility.createUtility(this,"appid=5804981b");
-        mSpeechSynthesizer = SpeechSynthesizer.createSynthesizer(this,null);
+        StringBuffer bf = new StringBuffer();
+        bf.append("appid=5ced1db3"); // APP_ID为对应的sdkid
+        bf.append(",");
+        SpeechUtility.createUtility(this.getApplicationContext(),bf.toString());
+        // SpeechUtility.createUtility(this,"appid=5ced1db3");
+        mSpeechSynthesizer = SpeechSynthesizer.createSynthesizer(this.getApplicationContext(),null);
         // 设置发音人`
         mSpeechSynthesizer.setParameter(SpeechConstant.VOICE_NAME, "xiaoyan");
         // 设置语速
